@@ -7,5 +7,5 @@ set(tutorial2_SRCS
   main.cpp
 )
  
-kde4_add_executable(activityfox ${tutorial2_SRCS})
-target_link_libraries(activityfox ${KDE4_KDEUI_LIBS})
+kde4_add_executable(activitychromium ${tutorial2_SRCS})
+target_link_libraries(activitychromium ${KDE4_KDEUI_LIBS})
