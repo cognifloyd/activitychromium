@@ -8,7 +8,7 @@
 //#include <KMessageBox>
 #include <iostream>
 
-const char* firefoxbin_path = "/usr/lib64/firefox/firefox-bin";
+const char* chromebin_path = "/usr/bin/chromium";
 
 class MainWindow : public KMainWindow
 {
@@ -18,7 +18,7 @@ class MainWindow : public KMainWindow
     void saveProperties(KConfigGroup& );
     void readProperties(const KConfigGroup& );
   private:
-    QString firefoxprofile;
+    QString chromeprofile;
     KProcess p;
 };
 
@@ -26,41 +26,44 @@ MainWindow::MainWindow(QString profile, QWidget *parent) : KMainWindow(parent)
 {
     setGeometry(100,100,200,100);
     if (profile != "") {
-        firefoxprofile = profile;
+        chromeprofile = "~/.config/chromium-k-" + profile;
         QStringList createProfileCommand;
-        createProfileCommand << firefoxbin_path << "-CreateProfile" << firefoxprofile;
+        //Create the activity specific profile directory if it doesn't exist
+        createProfileCommand << "/usr/bin/mkdir" << "-p" << chromeprofile;
         KProcess::execute(createProfileCommand);
-        p << firefoxbin_path << "-P" << firefoxprofile << "-no-remote";
+        //Run Chrome with the activity specific profile
+        p << chromebin_path << "--user-data-dir=" << chromeprofile;
         p.start();
     } else {
-        firefoxprofile = "";
+        chromeprofile = "";
     }
 }
 
 void MainWindow::saveProperties(KConfigGroup& conf) {
-    conf.writeEntry("ffProfile", firefoxprofile);
+    conf.writeEntry("chromeProfile", chromeprofile);
     p.kill();
 }
 
 void MainWindow::readProperties(const KConfigGroup& conf) {
-    firefoxprofile = conf.readEntry("ffProfile", QString());
-    p << firefoxbin_path << "-P" << firefoxprofile << "-no-remote";
+    chromeprofile = conf.readEntry("chromeProfile", QString());
+    p << chromebin_path << "--user-data-dir" << chromeprofile;
     p.start();
 }
 
 int main (int argc, char *argv[])
 {
-  KAboutData aboutData( "activityfox", 0,
-      ki18n("ActivityFox"), "0.1",
-      ki18n("Help Firefox work with KDE activities."),
+  KAboutData aboutData( "activitychromium", 0,
+      ki18n("ActivityChromium"), "0.1",
+      ki18n("Help Chromium work with KDE activities."),
       KAboutData::License_GPL,
       ki18n("Copyright (c) 2012 Yuen Hoe (Jason moofang)") );
+      ki18n("Copyright (c) 2015 Jacob Floyd (cognifloyd)") );
   KCmdLineArgs::init( argc, argv, &aboutData );
   KCmdLineOptions options;
-  options.add("+profilename", ki18n("Firefox profile name"));
+  options.add("+profilename", ki18n("Chromium profile name"));
   KCmdLineArgs::addCmdLineOptions(options);
   if (argc <= 1) {
-      std::cout << "Please specify firefox profile name" << std::endl;
+      std::cout << "Please specify Chromium profile name" << std::endl;
       return 0;
   }
  
