@@ -26,13 +26,13 @@ MainWindow::MainWindow(QString profile, QWidget *parent) : KMainWindow(parent)
 {
     setGeometry(100,100,200,100);
     if (profile != "") {
-        chromeprofile = "~/.config/chromium-k-" + profile;
+        chromeprofile = ".config/chromium-k-" + profile;
         QStringList createProfileCommand;
         //Create the activity specific profile directory if it doesn't exist
         createProfileCommand << "/usr/bin/mkdir" << "-p" << chromeprofile;
         KProcess::execute(createProfileCommand);
         //Run Chrome with the activity specific profile
-        p << chromebin_path << "--user-data-dir=" << chromeprofile;
+        p << chromebin_path << "--user-data-dir=" + chromeprofile;
         p.start();
     } else {
         chromeprofile = "";
@@ -46,7 +46,7 @@ void MainWindow::saveProperties(KConfigGroup& conf) {
 
 void MainWindow::readProperties(const KConfigGroup& conf) {
     chromeprofile = conf.readEntry("chromeProfile", QString());
-    p << chromebin_path << "--user-data-dir" << chromeprofile;
+    p << chromebin_path << "--user-data-dir=" + chromeprofile;
     p.start();
 }
 
@@ -56,8 +56,7 @@ int main (int argc, char *argv[])
       ki18n("ActivityChromium"), "0.1",
       ki18n("Help Chromium work with KDE activities."),
       KAboutData::License_GPL,
-      ki18n("Copyright (c) 2012 Yuen Hoe (Jason moofang)") );
-      ki18n("Copyright (c) 2015 Jacob Floyd (cognifloyd)") );
+      ki18n("Copyright (c) 2012 Yuen Hoe (Jason moofang); (c) 2015 Jacob Floyd (cognifloyd)") );
   KCmdLineArgs::init( argc, argv, &aboutData );
   KCmdLineOptions options;
   options.add("+profilename", ki18n("Chromium profile name"));
